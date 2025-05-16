@@ -8,7 +8,7 @@ export default function Home() {
     router.replace('/student');
 
 
-  }, [])
+  }, [router])
   return (
 
     <div></div>
