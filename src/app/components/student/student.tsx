@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Head from "next/head";
+import { useRouter } from "next/navigation";
 
 type Student = {
     _id: string;
@@ -42,7 +43,6 @@ export default function StudentManagement() {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [filterBranch, setFilterBranch] = useState<string>("");
 
-    // Fetch students on component mount
     useEffect(() => {
         const fetchStudents = async () => {
             try {
@@ -154,11 +154,10 @@ export default function StudentManagement() {
 
         try {
             const response = await axios.delete(`/api/students`, {
-                data: { id } 
+                data: { id }
             });
 
             console.log(response)
-            // Update the state to remove the deleted student
             setStudents((prev) => prev.filter((student) => student._id !== id));
             setSuccess("Student deleted successfully");
             setError("");
@@ -176,7 +175,6 @@ export default function StudentManagement() {
         }
     };
 
-    // Filter students based on search term and branch filter
     const filteredStudents = students.filter((student) => {
         const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
         const matchesSearch =
@@ -187,7 +185,7 @@ export default function StudentManagement() {
     });
 
     const scholarsCount = students.filter((student) => student.isScholar).length;
-
+    const router = useRouter();
     return (
         <div className="min-h-screen bg-gray-50">
             <Head>
@@ -443,6 +441,7 @@ export default function StudentManagement() {
                             <div className="p-6">
                                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Student Records</h2>
 
+                                <button onClick={() => router.replace('https://scholar-manager-git-main-jmtrinidads-projects-c5d38af8.vercel.app/api/students')}> Go to API </button>
                                 {/* Filters */}
                                 <div className="flex flex-col sm:flex-row gap-4 mb-6">
                                     <div className="flex-1">

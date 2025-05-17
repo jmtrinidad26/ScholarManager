@@ -29,19 +29,36 @@ interface StudentCreateBody {
   isScholar?: boolean;
 }
 
+// Helper function to set CORS headers
+function setCorsHeaders(response: NextResponse) {
+  // Allow all origins for a public API (or specify origins for better security)
+  response.headers.set("Access-Control-Allow-Origin", "*");
+  response.headers.set("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  // No credentials needed for public API
+  return response;
+}
+
+export async function OPTIONS() {
+  const response = NextResponse.json({}, { status: 200 });
+  return setCorsHeaders(response);
+}
+
 export async function GET() {
   try {
     await dbConnectionMain();
     const students = await StudentModel.find<Student>({});
-    return NextResponse.json(students);
+    const response = NextResponse.json(students);
+    return setCorsHeaders(response);
   } catch (error: unknown) {
     console.error("Error fetching students:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: "Error fetching students", error: errorMessage },
       { status: 500 }
     );
+    return setCorsHeaders(response);
   }
 }
 
@@ -62,10 +79,11 @@ export async function POST(request: Request) {
     ];
     const missingFields = requiredFields.filter((field) => !body[field]);
     if (missingFields.length > 0) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { message: `Missing required fields: ${missingFields.join(", ")}` },
         { status: 400 }
       );
+      return setCorsHeaders(response);
     }
 
     // Check for existing student
@@ -77,16 +95,18 @@ export async function POST(request: Request) {
     });
 
     if (existingStudent) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { message: "Student already exists" },
         { status: 409 }
       );
+      return setCorsHeaders(response);
     }
 
     const newStudent = new StudentModel(body);
     await newStudent.save();
 
-    return NextResponse.json(newStudent, { status: 201 });
+    const response = NextResponse.json(newStudent, { status: 201 });
+    return setCorsHeaders(response);
   } catch (error: unknown) {
     console.error("Error creating student:", error);
 
@@ -96,32 +116,21 @@ export async function POST(request: Request) {
       "code" in error &&
       (error as { code: number }).code === 11000
     ) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { message: "Student already exists" },
         { status: 409 }
       );
+      return setCorsHeaders(response);
     }
 
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: "Error creating student", error: errorMessage },
       { status: 500 }
     );
+    return setCorsHeaders(response);
   }
-}
-
-interface Student {
-  _id: mongoose.Types.ObjectId;
-  studentNumber: string;
-  schoolEmail: string;
-  firstName: string;
-  lastName: string;
-  year: string;
-  branch: string;
-  program: string;
-  isScholar: boolean;
-  createdAt: Date;
 }
 
 export async function DELETE(request: Request) {
@@ -130,42 +139,47 @@ export async function DELETE(request: Request) {
     const { id } = await request.json();
 
     if (!id) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { message: "Student ID is required" },
         { status: 400 }
       );
+      return setCorsHeaders(response);
     }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { message: "Invalid student ID" },
         { status: 400 }
       );
+      return setCorsHeaders(response);
     }
 
     const deletedStudent = await StudentModel.findByIdAndDelete(id);
 
     if (!deletedStudent) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { message: "Student not found" },
         { status: 404 }
       );
+      return setCorsHeaders(response);
     }
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: "Student deleted successfully",
-        deletedStudent, // Include the deleted student data in response
+        deletedStudent,
       },
       { status: 200 }
     );
+    return setCorsHeaders(response);
   } catch (error: unknown) {
     console.error("Error deleting student:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: "Error deleting student", error: errorMessage },
       { status: 500 }
     );
+    return setCorsHeaders(response);
   }
 }
