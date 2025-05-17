@@ -31,7 +31,7 @@ interface StudentCreateBody {
 
 function setCorsHeaders(response: NextResponse, request?: Request) {
   const allowedOrigins = [
-    "http://localhost:3001",
+    "http://localhost:3000",
     "https://scholar-manager-git-main-jmtrinidads-projects-c5d38af8.vercel.app/",
   ];
 
