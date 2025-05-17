@@ -29,30 +29,40 @@ interface StudentCreateBody {
   isScholar?: boolean;
 }
 
-// Helper function to set CORS headers
-function setCorsHeaders(response: NextResponse) {
-  // Allow all origins for a public API (or specify origins for better security)
-  response.headers.set("Access-Control-Allow-Origin", "*");
+function setCorsHeaders(response: NextResponse, request?: Request) {
+  const allowedOrigins = [
+    "http://localhost:3001",
+    "https://scholar-manager-git-main-jmtrinidads-projects-c5d38af8.vercel.app/",
+  ];
+
+  // Get the request origin
+  const requestOrigin = request?.headers.get("origin") || "";
+
+  // Check if the request origin is allowed
+  const origin = allowedOrigins.includes(requestOrigin)
+    ? requestOrigin
+    : allowedOrigins[0];
+
+  response.headers.set("Access-Control-Allow-Origin", origin);
   response.headers.set(
     "Access-Control-Allow-Methods",
     "GET,POST,DELETE,OPTIONS"
   );
   response.headers.set("Access-Control-Allow-Headers", "Content-Type");
-  // No credentials needed for public API
+  response.headers.set("Access-Control-Allow-Credentials", "true");
   return response;
 }
-
-export async function OPTIONS() {
+export async function OPTIONS(request: Request) {
   const response = NextResponse.json({}, { status: 200 });
-  return setCorsHeaders(response);
+  return setCorsHeaders(response, request);
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await dbConnectionMain();
     const students = await StudentModel.find<Student>({});
     const response = NextResponse.json(students);
-    return setCorsHeaders(response);
+    return setCorsHeaders(response, request);
   } catch (error: unknown) {
     console.error("Error fetching students:", error);
     const errorMessage =
@@ -61,7 +71,7 @@ export async function GET() {
       { message: "Error fetching students", error: errorMessage },
       { status: 500 }
     );
-    return setCorsHeaders(response);
+    return setCorsHeaders(response, request);
   }
 }
 
@@ -86,7 +96,7 @@ export async function POST(request: Request) {
         { message: `Missing required fields: ${missingFields.join(", ")}` },
         { status: 400 }
       );
-      return setCorsHeaders(response);
+      return setCorsHeaders(response, request);
     }
 
     // Check for existing student
@@ -102,14 +112,14 @@ export async function POST(request: Request) {
         { message: "Student already exists" },
         { status: 409 }
       );
-      return setCorsHeaders(response);
+      return setCorsHeaders(response, request);
     }
 
     const newStudent = new StudentModel(body);
     await newStudent.save();
 
     const response = NextResponse.json(newStudent, { status: 201 });
-    return setCorsHeaders(response);
+    return setCorsHeaders(response, request);
   } catch (error: unknown) {
     console.error("Error creating student:", error);
 
@@ -123,7 +133,7 @@ export async function POST(request: Request) {
         { message: "Student already exists" },
         { status: 409 }
       );
-      return setCorsHeaders(response);
+      return setCorsHeaders(response, request);
     }
 
     const errorMessage =
@@ -132,7 +142,7 @@ export async function POST(request: Request) {
       { message: "Error creating student", error: errorMessage },
       { status: 500 }
     );
-    return setCorsHeaders(response);
+    return setCorsHeaders(response, request);
   }
 }
 
@@ -146,7 +156,7 @@ export async function DELETE(request: Request) {
         { message: "Student ID is required" },
         { status: 400 }
       );
-      return setCorsHeaders(response);
+      return setCorsHeaders(response, request);
     }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -154,7 +164,7 @@ export async function DELETE(request: Request) {
         { message: "Invalid student ID" },
         { status: 400 }
       );
-      return setCorsHeaders(response);
+      return setCorsHeaders(response, request);
     }
 
     const deletedStudent = await StudentModel.findByIdAndDelete(id);
@@ -164,7 +174,7 @@ export async function DELETE(request: Request) {
         { message: "Student not found" },
         { status: 404 }
       );
-      return setCorsHeaders(response);
+      return setCorsHeaders(response, request);
     }
 
     const response = NextResponse.json(
@@ -174,7 +184,7 @@ export async function DELETE(request: Request) {
       },
       { status: 200 }
     );
-    return setCorsHeaders(response);
+    return setCorsHeaders(response, request);
   } catch (error: unknown) {
     console.error("Error deleting student:", error);
     const errorMessage =
@@ -183,6 +193,6 @@ export async function DELETE(request: Request) {
       { message: "Error deleting student", error: errorMessage },
       { status: 500 }
     );
-    return setCorsHeaders(response);
+    return setCorsHeaders(response, request);
   }
 }
