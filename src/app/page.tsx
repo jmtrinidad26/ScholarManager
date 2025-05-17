@@ -5,7 +5,7 @@ export default function Home() {
   const router = useRouter();
   useEffect(() => {
 
-    router.replace('/student');
+    router.replace('/api/students');
 
 
   }, [router])
