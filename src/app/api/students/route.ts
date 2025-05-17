@@ -33,7 +33,10 @@ interface StudentCreateBody {
 function setCorsHeaders(response: NextResponse) {
   // Allow all origins for a public API (or specify origins for better security)
   response.headers.set("Access-Control-Allow-Origin", "*");
-  response.headers.set("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
+  response.headers.set(
+    "Access-Control-Allow-Methods",
+    "GET,POST,DELETE,OPTIONS"
+  );
   response.headers.set("Access-Control-Allow-Headers", "Content-Type");
   // No credentials needed for public API
   return response;
