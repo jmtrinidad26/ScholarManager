@@ -6,12 +6,13 @@ function setCorsHeaders(response: NextResponse, request?: Request) {
   const allowedOrigins = [
     "http://localhost:3000",
     "https://scholar-manager-git-main-jmtrinidads-projects-c5d38af8.vercel.app/",
+    "hhttps://stronglabs.vercel.app/",
   ];
 
   const requestOrigin = request?.headers.get("origin") || "";
   const origin = allowedOrigins.includes(requestOrigin)
     ? requestOrigin
-    : allowedOrigins[0];
+    : allowedOrigins[2];
 
   response.headers.set("Access-Control-Allow-Origin", origin);
   response.headers.set(
