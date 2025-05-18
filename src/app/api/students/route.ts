@@ -15,10 +15,7 @@ function setCorsHeaders(response: NextResponse, request?: Request) {
     : allowedOrigins[2];
 
   response.headers.set("Access-Control-Allow-Origin", origin);
-  response.headers.set(
-    "Access-Control-Allow-Methods",
-    "GET"
-  );
+  response.headers.set("Access-Control-Allow-Methods", "GET");
   response.headers.set("Access-Control-Allow-Headers", "Content-Type");
   response.headers.set("Access-Control-Allow-Credentials", "true");
   return response;
@@ -44,6 +41,8 @@ export async function GET(request: Request) {
       } else if (student.course === "BSIT") {
         program = "Bachelor of Science in Information Technology";
       }
+      const yearLevel = student.year_level;
+      const yearDigit = yearLevel ? yearLevel.match(/\d/)?.[0] || "" : "";
 
       return {
         _id: student.student_id.toString(),
@@ -51,7 +50,7 @@ export async function GET(request: Request) {
         schoolEmail: student.school_email,
         firstName: student.scholar_name.split(" ")[0] || "",
         lastName: student.scholar_name.split(" ").slice(1).join(" ") || "",
-        year: student.year_level,
+        year: yearDigit,
         branch: student.campus,
         program: program,
         isScholar: true,
