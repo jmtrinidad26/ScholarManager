@@ -23,6 +23,7 @@ function setCorsHeaders(response: NextResponse, request?: Request) {
   response.headers.set("Access-Control-Allow-Credentials", "true");
   return response;
 }
+// test
 
 export async function OPTIONS(request: Request) {
   const response = NextResponse.json({}, { status: 200 });
