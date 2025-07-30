@@ -5,5 +5,6 @@ export interface Student {
   year_level: string;
   course: string;
   campus: string;
+  graduation_year: Date;
   scholarship_status: string;
 }
