@@ -7,4 +7,6 @@ export interface Student {
   campus: string;
   graduation_year: Date;
   scholarship_status: string;
+  delistment_date: Date | null;
+  delistment_reason: string | null;
 }

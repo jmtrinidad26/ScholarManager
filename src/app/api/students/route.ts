@@ -183,6 +183,7 @@ export async function GET(request: Request) {
       `SELECT student_id, scholar_name, school_email, year_level, course, campus, delistment_date, delistment_reason, graduation_year, scholarship_status
        FROM public.masterlist_detailed`
     );
+    console.log(students);
 
     const transformedStudents = students.map((student) => {
       let program = student.course;
@@ -205,6 +206,8 @@ export async function GET(request: Request) {
         year: yearDigit,
         branch: student.campus,
         program: program,
+        delistment_date: student.delistment_date,
+        delistment_reason: student.delistment_reason,
         createdAt: new Date().toISOString(),
         __v: 0,
       };
